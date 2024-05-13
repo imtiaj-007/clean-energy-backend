@@ -241,11 +241,16 @@ const deleteBill = async (req, res) => {
     }
 }
 
+const generatePdf = async (req, res)=> {
+    console.log('generate pdf');
+}
+
 
 module.exports = {
     // getAllBills,
     getBills,
     getUserBillsById,
+    generatePdf,
     createBill,
     updateBill,
     deleteBill

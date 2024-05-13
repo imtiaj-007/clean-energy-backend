@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reciept PDF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        .body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: "Reddit Sans", sans-serif;
+        }
+
+        .heading {
+            padding: 0.3rem;
+            text-align: center;
+            background-color: rgb(69, 69, 219);
+            color: white;
+            border-radius: 1rem;
+        }
+
+        .common-heading {
+            padding: 0.3rem;
+            text-align: center;
+            color: rgb(48, 46, 56);
+            border-bottom: 2px solid grey;
+        }
+
+        .border {
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container-fluid bg-dark p-3">
+            <div class="container ">
+                <div class="row">
+                    <div class="col-3"><img src="../public/logo.svg" alt="brand-logo" style="width: 10.4rem;
+                    object-fit: contain;"></div>
+                    <div class="col-6"></div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section class="container my-3">
+        <h3 class="heading">Payment Reciept</h3>
+        <div class="row p-3">
+            <div class="col-8">
+                <table class="table table-bordered table-striped " style="font-weight: 600;">
+                    <tbody id="recieptBody">
+
+                        <tr>
+                            <td>Transaction No.</td>
+                            <td>{{transactionNo}}</td>
+                        </tr>
+                        <tr>
+                            <td>Customer ID</td>
+                            <td>{{customerId}}</td>
+                        </tr>
+                        <tr>
+                            <td>Bill Number</td>
+                            <td>{{billNo}}</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Amount</td>
+                            <td>{{amount}}</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Method</td>
+                            <td>{{method}}</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Date</td>
+                            <td>{{date}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="border border-3 p-3">
+                    <p>
+                        <strong>Note:</strong><br>
+                        Thank you for your payment! Your contribution helps us maintain reliable electricity services
+                        and supports our commitment to sustainable energy practices. We appreciate your continued
+                        partnership in building a greener future. For any inquiries or assistance, please don't hesitate
+                        to contact us. Have a wonderful day!
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-4 border border-3 p-4 ">
+
+                <h4 class="common-heading">About Me </h4>
+                <p>
+                    Hello and thank you for visiting my Electricity Bill Management System Clean Energy!
+                    <br>
+                    I'm SK IMTIAJ UDDIN, pre-final year undergraduate student, currently pursuing B.Tech in
+                    Information Technology, from Budge Budge Institute of Technology, Kolkata.
+                    <br>
+                    I'm showcasing my skills in Web Development by creating this platform for learning and
+                    demonstration purpose only. Dive into the features, enjoy this Full Stack project and experience the
+                    beauty of MERN Stack Application, and feel free to navigate through various sections.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</body>
+
+</html>

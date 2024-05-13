@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const jwtSecret = process.env.SECRET || "#secretKey";
 
 async function fetchUser(req, res, next) {

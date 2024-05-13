@@ -92,8 +92,13 @@ const getLastPayment = async(req, res)=> {
     }
 }
 
+const sendPdf = async (req, res) =>{
+    
+}
+
 module.exports = {
     getPayments,
     handleNewPayment,
-    getLastPayment
+    getLastPayment,
+    sendPdf
 }

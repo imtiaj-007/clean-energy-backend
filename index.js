@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const env = require('dotenv').config();
+const expressLayouts = require('express-ejs-layouts');
+require('dotenv').config();
 
 const billsRoutes = require("./routes/bills");
 const userRoutes = require('./routes/user');
@@ -18,17 +19,20 @@ mongoose
         console.log(`Internal Server Error : ${error}`);
     })
 
-const App = express();
+const app = express();
 const PORT = process.env.PORT || 5000;
 
-App.use(cors());
-App.use(express.json());
-App.use(express.urlencoded({extended: false}));
+app.use(expressLayouts);
+app.set('view engine', 'ejs');
 
-App.use("/api/bills", billsRoutes);
-App.use("/api/users", userRoutes);
-App.use("/api/payments", paymentRoutes);
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
-App.listen(PORT, ()=>{
+app.use("/api/bills", billsRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/payments", paymentRoutes);
+
+app.listen(PORT, ()=>{
     console.log(`Server started at port: ${PORT}`);
 })
