@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 require('dotenv').config();
 
@@ -24,6 +25,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
 app.use(express.json());
