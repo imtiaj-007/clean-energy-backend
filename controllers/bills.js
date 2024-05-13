@@ -1,19 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+const pdf = require('pdf-creator-node');
+
 const Bills = require('../models/bills');
 const Users = require('../models/user');
-
-// const data = require('../BILLS_DATA.json');
-
-// const getAllBills = async (req, res) => {
-//     try {
-//         const data = await Bills.find({});
-//         return res.status(200).json(data);
-//     } catch (error) {
-//         return res.status(500).json({
-//             success: false,
-//             error
-//         })
-//     }
-// }
 
 const getBills = async (req, res) => {
     try {
@@ -241,17 +231,80 @@ const deleteBill = async (req, res) => {
     }
 }
 
-const generatePdf = async (req, res)=> {
-    console.log('generate pdf');
+const sendPDF = async (req, res)=> {
+    try {
+        const { _id } = req.params;
+        const bill = await Bills.findById(_id); 
+        const user = await Users.findById(bill.userID);
+
+        const fileName = `${Date.now()}.pdf`;
+        const filePath = path.resolve(`./docs/bills/${fileName}`);
+
+        // Generate the PDF file
+        await generatePdf(filePath, bill, user);
+
+        // Check if the PDF file exists
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({
+                success: false,
+                message: 'PDF file not found'
+            });
+        }
+
+        // Send the PDF file as a response
+        res.contentType('application/pdf');
+        res.sendFile(filePath);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            error
+        });
+    }
 }
+
+const generatePdf = async (filePath, billObj, userObj) => {
+    try {
+        const htmlTemplate = fs.readFileSync(path.resolve('./views/billTemplate.html'), 'utf8');
+        const html = htmlTemplate.replace(/{{customerId}}/g, userObj._id)
+            .replace(/{{customerName}}/g, userObj.customerName)
+            .replace(/{{email}}/g, userObj.email)
+            .replace(/{{billNo}}/g, billObj._id)
+            .replace(/{{units}}/g, billObj.units)
+            .replace(/{{amount}}/g, billObj.amount)
+            .replace(/{{connecType}}/g, userObj.connectionType)
+            .replace(/{{date}}/g, billObj.date);
+
+        const options = {
+            format: "A4",
+            orientation: "portrait",
+            border: "20mm",
+        };
+
+        const document = {
+            html: html,
+            data: { billObj },
+            path: filePath, 
+        };
+
+        // Generate the PDF
+        await pdf.create(document, options);
+
+    } catch (error) {
+        console.log(error);
+        throw error; 
+    }
+};
 
 
 module.exports = {
     // getAllBills,
     getBills,
     getUserBillsById,
-    generatePdf,
     createBill,
     updateBill,
-    deleteBill
+    deleteBill,
+    sendPDF,
 }
