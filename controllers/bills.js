@@ -5,15 +5,10 @@ const pdf = require('pdf-creator-node');
 const Bills = require('../models/bills');
 const Users = require('../models/user');
 
+
 const getBills = async (req, res) => {
     try {
         const { _id, isAdmin } = req.user;
-        const user = await Users.findById(_id);
-
-        if (!user) return res.status(404).json({
-            success: false,
-            message: "User Not Found"
-        });
 
         let queryObj = {};
         const { searchID, startDate, endDate, minValue, maxValue, minUnit, maxUnit, paymentStatus, connecType, sort } = req.query;
@@ -52,6 +47,7 @@ const getBills = async (req, res) => {
             bills
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: error.message
@@ -79,6 +75,7 @@ const getUserBillsById = async (req, res) => {
             user
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error.message
@@ -87,16 +84,9 @@ const getUserBillsById = async (req, res) => {
 }
 
 const createBill = async (req, res) => {
-    // await Bills.deleteMany({});
-    // await Bills.insertMany(data);
-    // return res.status(200).json({
-    //     success: true,
-    //     message: "Bills created Successfully",
-    // });
-
     try {
         const { _id, units } = req.body;
-        const user = await Users.findById({ _id });
+        const user = await Users.findById(_id);
         if (!user)
             return res.status(404).json({
                 success: false,
@@ -111,7 +101,6 @@ const createBill = async (req, res) => {
         const startOfMonth = new Date(`${currentYear}-${currentMonth}-01`);
         const endOfMonth = new Date(`${currentYear}-${currentMonth + 1}-01`);
         
-        console.log(startOfMonth, endOfMonth);
         const bill = await Bills.findOne({
             userID: _id,
             createdAt: {
@@ -119,7 +108,7 @@ const createBill = async (req, res) => {
                 $lte: endOfMonth // Last day of the current month
             }
         });
-        console.log(bill)
+
         if (bill)
             return res.status(400).json({
                 success: false,
@@ -147,10 +136,10 @@ const createBill = async (req, res) => {
             newBill
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error.message,
-            error
         });
     }
 }
@@ -158,7 +147,7 @@ const createBill = async (req, res) => {
 const updateBill = async (req, res) => {
     try {
         const { _id, units, billNo } = req.body;
-        const user = await Users.findById({ _id });
+        const user = await Users.findById(_id);
         if (!user)
             return res.status(404).json({
                 success: false,
@@ -186,22 +175,18 @@ const updateBill = async (req, res) => {
             newBill
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: error.message,
-            error
         });
     }
 }
 
 const deleteBill = async (req, res) => {
-    // console.log(req.body)
-    // await Bills.deleteMany({ userID: req.body.userID });
-    // return res.json({ success: true });
-
     try {
         const { _id, billNo } = req.body;
-        const user = await Users.findById({ _id });
+        const user = await Users.findById(_id);
         if (!user)
             return res.status(404).json({
                 success: false,
@@ -223,10 +208,10 @@ const deleteBill = async (req, res) => {
             newBill
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: error.message,
-            error
         });
     }
 }
@@ -255,12 +240,17 @@ const sendPDF = async (req, res)=> {
         res.contentType('application/pdf');
         res.sendFile(filePath);
 
+        fs.unlink(filePath, (err) => {
+            if (err) {
+              console.log(`Error deleting file: ${err}`);
+            }
+        });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
             message: error.message,
-            error
         });
     }
 }
@@ -300,7 +290,6 @@ const generatePdf = async (filePath, billObj, userObj) => {
 
 
 module.exports = {
-    // getAllBills,
     getBills,
     getUserBillsById,
     createBill,

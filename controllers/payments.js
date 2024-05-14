@@ -145,6 +145,12 @@ const sendPdf = async (req, res) => {
         res.contentType('application/pdf');
         res.sendFile(filePath);
 
+        fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error(`Error deleting file: ${err}`);
+            } 
+        });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({

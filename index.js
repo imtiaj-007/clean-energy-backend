@@ -1,18 +1,18 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-require('dotenv').config();
 
 const billsRoutes = require("./routes/bills");
 const userRoutes = require('./routes/user');
 const paymentRoutes = require('./routes/payments');
 
-const uri = process.env.MONGO_URI || "mongodb://localhost:27017/cleanEnergy";
+const url = process.env.MONGO_URL;
 
 mongoose
-    .connect(uri)
+    .connect(url)
     .then(() => {
         console.log("Connected to MongoDB");
     })
@@ -21,7 +21,7 @@ mongoose
     })
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 app.use(expressLayouts);
 app.set('view engine', 'ejs');

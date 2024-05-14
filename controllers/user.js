@@ -1,8 +1,9 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const Users = require('../models/user');
 
-const jwtSecret = process.env.SECRET || "#secretKey";
+const jwtSecret = process.env.SECRET;
 
 const handleGetAllUsers = async (req, res)=> {
     try {

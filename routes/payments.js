@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { fetchUser, getUser } = require('../middlewares/auth');
+const { fetchUser } = require('../middlewares/auth');
 const {
     getPayments,
     handleNewPayment,
@@ -11,9 +11,9 @@ const router = Router();
 
 router.route('/')
     .get(fetchUser, getPayments)
-    .post(getUser, handleNewPayment)
+    .post(fetchUser, handleNewPayment)
 
-router.get('/getPDF/:_id', sendPdf);
+router.get('/receipt/:_id', sendPdf);
 router.get('/:userID', getLastPayment);
 
 module.exports = router;

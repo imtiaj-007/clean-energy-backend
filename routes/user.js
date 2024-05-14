@@ -8,7 +8,7 @@ const { fetchUser } = require('../middlewares/auth');
 
 const router = Router();
 
-router.get('/getAllUsers', fetchUser, handleGetAllUsers);
+router.get('/', fetchUser, handleGetAllUsers);
 router.post('/login', handleGetUser);
 router.post('/signup', handleCreateUser);
 
