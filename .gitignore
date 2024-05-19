@@ -25,5 +25,6 @@ dist-ssr
 *.sw?
 
 BILLS_DATA.json
+BILLS_DATA_2.json
 USER_DATA.json
 .env

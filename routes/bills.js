@@ -2,6 +2,7 @@ const express = require('express');
 const { fetchUser } = require('../middlewares/auth');
 const {
     getBills,
+    getBillById,
     getUserBillsById,
     createBill,
     updateBill,
@@ -12,7 +13,8 @@ const {
 const router = express.Router();
 
 router.get('/', fetchUser, getBills);
-router.get('/:id', getUserBillsById);
+router.get('/:_id', getBillById);
+router.get('/user/:_id', getUserBillsById);
 
 router.route('/createBill')
     .post(fetchUser, createBill)

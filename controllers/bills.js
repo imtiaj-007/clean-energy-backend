@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const pdf = require('pdf-creator-node');
+const mongoose = require('mongoose');
 
 const Bills = require('../models/bills');
 const Users = require('../models/user');
@@ -55,19 +56,60 @@ const getBills = async (req, res) => {
     }
 }
 
+const getBillById = async (req, res) => {
+    try {
+        const { _id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Bill Not Found...! Invalid Bill No'
+            });
+        }
+        const bill = await Bills.findById(_id);
+        if (!bill) return res.status(404).json({
+            success: false,
+            message: "Bill Not Found"
+        });
+
+        return res.status(200).json({
+            success: true,
+            bill
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+
 const getUserBillsById = async (req, res) => {
     try {
-        const searchID = req.params.id;
+        const { _id } = req.params;
 
         let user;
-        if (searchID) {
-            if (searchID.includes('@'))
-                user = await Users.findOne({ email: searchID });
-            else
-                user = await Users.findOne({ _id: searchID });
+        if (_id) {
+            if (_id.includes('@'))
+                user = await Users.findOne({ email: _id });
+            else {
+                // Validate ObjectId
+                if (!mongoose.Types.ObjectId.isValid(_id)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'User Not Found...! Invalid user ID'
+                    });
+                }
+                user = await Users.findById( _id );
+            }
         }
-        if (!user) return res.status(404).json("User Not Found");
-    
+        if (!user) 
+            return res.status(400).json({
+                success: false,
+                message: 'User Not Found...!'
+            });
+
         const bills = await Bills.find({ userID: user._id }).sort({ date: -1 });
         return res.status(200).json({
             success: true,
@@ -100,7 +142,7 @@ const createBill = async (req, res) => {
         // Calculate the start and end dates for the current month
         const startOfMonth = new Date(`${currentYear}-${currentMonth}-01`);
         const endOfMonth = new Date(`${currentYear}-${currentMonth + 1}-01`);
-        
+
         const bill = await Bills.findOne({
             userID: _id,
             createdAt: {
@@ -199,6 +241,11 @@ const deleteBill = async (req, res) => {
                 success: false,
                 message: "Bill doesn't exists"
             });
+        if (newBill.status === 'Paid')
+            return res.status(400).json({
+                success: false,
+                message: "Can't Delete...! Transaction has been found for the bill."
+            });
 
         await Bills.deleteOne({ _id: billNo });
 
@@ -216,10 +263,10 @@ const deleteBill = async (req, res) => {
     }
 }
 
-const sendPDF = async (req, res)=> {
+const sendPDF = async (req, res) => {
     try {
         const { _id } = req.params;
-        const bill = await Bills.findById(_id); 
+        const bill = await Bills.findById(_id);
         const user = await Users.findById(bill.userID);
 
         const fileName = `${Date.now()}.pdf`;
@@ -242,7 +289,7 @@ const sendPDF = async (req, res)=> {
 
         fs.unlink(filePath, (err) => {
             if (err) {
-              console.log(`Error deleting file: ${err}`);
+                console.log(`Error deleting file: ${err}`);
             }
         });
 
@@ -276,7 +323,7 @@ const generatePdf = async (filePath, billObj, userObj) => {
         const document = {
             html: html,
             data: { billObj },
-            path: filePath, 
+            path: filePath,
         };
 
         // Generate the PDF
@@ -284,13 +331,14 @@ const generatePdf = async (filePath, billObj, userObj) => {
 
     } catch (error) {
         console.log(error);
-        throw error; 
+        throw error;
     }
 };
 
 
 module.exports = {
     getBills,
+    getBillById,
     getUserBillsById,
     createBill,
     updateBill,

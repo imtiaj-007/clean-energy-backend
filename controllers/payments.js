@@ -1,6 +1,7 @@
 const fs = require('fs');
 const pdf = require('pdf-creator-node');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const Payments = require('../models/payments');
 const Bills = require('../models/bills');
@@ -98,17 +99,27 @@ const handleNewPayment = async (req, res) => {
 const getLastPayment = async (req, res) => {
     try {
         const { userID } = req.params;
-        const user = await Users.findById({ _id: userID });
+
+        // Validate ObjectId
+        if (!mongoose.Types.ObjectId.isValid(userID)) {
+            return res.status(400).json({
+                success: false,
+                message: 'User Not Found...! Invalid user ID'
+            });
+        }
+
+        const user = await Users.findById( userID );
         if (!user) return res.status(404).json({
             success: false,
             message: "User Not Found"
         });
 
-        let data = await Payments.find({ userID }).sort({ createdAt: -1 }).limit(1);
-        const { _doc } = data[0];
-        const bill = await Bills.findById({ _id: _doc.billNo });
+        const data = await Payments.find({ userID }).sort({ createdAt: -1 }).limit(1);
 
-        const payment = { ..._doc, customerName: user.customerName, units: bill.units };
+        const { billNo } = data[0];
+        const bill = await Bills.findById( billNo );
+
+        payment = { ...data[0]._doc, customerName: user.customerName, units: bill.units };
         return res.status(200).json({
             success: true,
             payment
