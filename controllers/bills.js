@@ -101,10 +101,10 @@ const getUserBillsById = async (req, res) => {
                         message: 'User Not Found...! Invalid user ID'
                     });
                 }
-                user = await Users.findById( _id );
+                user = await Users.findById(_id);
             }
         }
-        if (!user) 
+        if (!user)
             return res.status(400).json({
                 success: false,
                 message: 'User Not Found...!'
@@ -195,6 +195,19 @@ const updateBill = async (req, res) => {
                 success: false,
                 message: "User doesn't exists"
             });
+
+        const newBill = await Bills.findOne({ _id: billNo, userID: _id });
+        if (!newBill)
+            return res.status(404).json({
+                success: false,
+                message: "Bill doesn't exists"
+            });
+        if (newBill.status === 'Paid')
+            return res.status(400).json({
+                success: false,
+                message: "Can't Update...! Transaction has been found for the bill."
+            });
+
         let amount = 0, type = user.connectionType;
 
         switch (type) {
@@ -209,8 +222,8 @@ const updateBill = async (req, res) => {
                 break;
         }
 
-        await Bills.updateOne({ _id: billNo, userID: _id }, { $set: { units: units, amount: amount } });
-        const newBill = await Bills.findOne({ _id: billNo });
+        await Bills.updateOne({ _id: billNo, userID: _id }, { $set: { units: parseInt(units), amount: amount } });
+        newBill = await Bills.findOne({ _id: billNo });
         return res.status(200).json({
             success: true,
             message: "Bill updated Successfully",
@@ -268,6 +281,12 @@ const sendPDF = async (req, res) => {
         const { _id } = req.params;
         const bill = await Bills.findById(_id);
         const user = await Users.findById(bill.userID);
+
+        // return res.status(200).json({
+        //     success: true,
+        //     bill,
+        //     user
+        // })
 
         const fileName = `${Date.now()}.pdf`;
         const filePath = path.resolve(`./docs/bills/${fileName}`);
