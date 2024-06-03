@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const Bills = require('../models/bills');
 const Users = require('../models/user');
+const { error } = require('console');
 
 
 const getBills = async (req, res) => {
@@ -20,6 +21,12 @@ const getBills = async (req, res) => {
                 user = await Users.findOne({ email: searchID });
             else
                 user = await Users.findOne({ _id: searchID });
+            
+            if(!user) return res.status(404).json({
+                success: false,
+                message: 'User not found... !',
+                error
+            });
             queryObj = { ...queryObj, userID: user._id };
         }
 
@@ -196,7 +203,7 @@ const updateBill = async (req, res) => {
                 message: "User doesn't exists"
             });
 
-        const newBill = await Bills.findOne({ _id: billNo, userID: _id });
+        let newBill = await Bills.findOne({ _id: billNo, userID: _id });
         if (!newBill)
             return res.status(404).json({
                 success: false,
@@ -282,11 +289,11 @@ const sendPDF = async (req, res) => {
         const bill = await Bills.findById(_id);
         const user = await Users.findById(bill.userID);
 
-        // return res.status(200).json({
-        //     success: true,
-        //     bill,
-        //     user
-        // })
+        return res.status(200).json({
+            success: true,
+            bill,
+            user
+        })
 
         const fileName = `${Date.now()}.pdf`;
         const filePath = path.resolve(`./docs/bills/${fileName}`);

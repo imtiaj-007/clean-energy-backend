@@ -143,6 +143,11 @@ const sendPdf = async (req, res) => {
         const { _id } = req.params;
         const receipt = await Payments.findById(_id); 
 
+        return res.status(200).json({
+            success: true,
+            receipt
+        })
+
         const fileName = `${Date.now()}.pdf`;
         const filePath = path.resolve(`./docs/payments/${fileName}`);
 
