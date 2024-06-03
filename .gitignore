@@ -24,6 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 
+data.json
 BILLS_DATA.json
 BILLS_DATA_2.json
 USER_DATA.json

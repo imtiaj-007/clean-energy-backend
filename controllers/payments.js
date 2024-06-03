@@ -20,19 +20,25 @@ const getPayments = async (req, res) => {
                 user = await Users.findOne({ email: searchID });
             else
                 user = await Users.findOne({ _id: searchID });
+
+            if (!user) return res.status(404).json({
+                success: false,
+                message: 'User not found...!',
+                error
+            });
             queryObj = { ...queryObj, userID: user._id };
         }
 
         if (!isAdmin) queryObj = { ...queryObj, userID: _id };
         if (startDate || endDate) {
             let sdate = startDate ? new Date(startDate) : new Date('2024-01-01');
-            let edate  = endDate ? new Date(endDate) : new Date();
+            let edate = endDate ? new Date(endDate) : new Date();
             edate.setDate(edate.getDate() + 1);
             queryObj = { ...queryObj, createdAt: { $gte: sdate, $lt: edate } };
         }
         if (minValue || maxValue) queryObj = { ...queryObj, amount: { $gte: minValue ? minValue : 0, $lte: maxValue ? maxValue : 4000 } };
         if (minUnit || maxUnit) queryObj = { ...queryObj, units: { $gte: minUnit ? minUnit : 0, $lte: maxUnit ? maxUnit : 500 } };
-        if(paymentMethod) queryObj = { ...queryObj, method: paymentMethod };
+        if (paymentMethod) queryObj = { ...queryObj, method: paymentMethod };
 
         let queryData = Payments.find(queryObj);
         if (sort) {
@@ -108,21 +114,21 @@ const getLastPayment = async (req, res) => {
             });
         }
 
-        const user = await Users.findById( userID );
+        const user = await Users.findById(userID);
         if (!user) return res.status(404).json({
             success: false,
             message: "User Not Found"
         });
 
         const data = await Payments.find({ userID }).sort({ createdAt: -1 }).limit(1);
-        
-        if(data.length === 0) return res.status(404).json({
+
+        if (data.length === 0) return res.status(404).json({
             success: false,
             message: "No payment record found !"
         })
 
         const { billNo } = data[0];
-        const bill = await Bills.findById( billNo );
+        const bill = await Bills.findById(billNo);
 
         payment = { ...data[0]._doc, customerName: user.customerName, units: bill.units };
         return res.status(200).json({
@@ -141,7 +147,7 @@ const getLastPayment = async (req, res) => {
 const sendPdf = async (req, res) => {
     try {
         const { _id } = req.params;
-        const receipt = await Payments.findById(_id); 
+        const receipt = await Payments.findById(_id);
 
         return res.status(200).json({
             success: true,
@@ -168,8 +174,8 @@ const sendPdf = async (req, res) => {
 
         fs.unlink(filePath, (err) => {
             if (err) {
-              console.error(`Error deleting file: ${err}`);
-            } 
+                console.error(`Error deleting file: ${err}`);
+            }
         });
 
     } catch (error) {
@@ -201,7 +207,7 @@ const generatePdf = async (filePath, paymentObj) => {
         const document = {
             html: html,
             data: { paymentObj },
-            path: filePath, 
+            path: filePath,
         };
 
         // Generate the PDF
@@ -209,7 +215,7 @@ const generatePdf = async (filePath, paymentObj) => {
 
     } catch (error) {
         console.log(error);
-        throw error; 
+        throw error;
     }
 };
 
